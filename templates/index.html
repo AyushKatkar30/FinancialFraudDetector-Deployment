@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fraud Detection System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body {
+            background-color: #f4f4f4;
+            font-family: 'Arial', sans-serif;
+        }
+        .container {
+            max-width: 500px;
+            background: white;
+            padding: 20px;
+            margin-top: 50px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .btn-primary {
+            width: 100%;
+            background-color: #007bff;
+            border: none;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        #result {
+            margin-top: 15px;
+            font-weight: bold;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h3 class="text-center">Fraud Detection System</h3>
+    <p class="text-center">Enter transaction details below</p>
+
+    <label>Transaction Type (1-5):</label>
+    <input type="number" id="transaction_type" class="form-control">
+
+    <label>Amount:</label>
+    <input type="number" id="amount" class="form-control">
+
+    <label>Old Balance:</label>
+    <input type="number" id="old_balance" class="form-control">
+
+    <label>New Balance:</label>
+    <input type="number" id="new_balance" class="form-control">
+
+    <button class="btn btn-primary" onclick="checkFraud()">Check Fraud</button>
+
+    <p id="result"></p>
+</div>
+
+<script>
+    function checkFraud() {
+        let data = {
+            features: [
+                parseInt(document.getElementById("transaction_type").value),
+                parseFloat(document.getElementById("amount").value),
+                parseFloat(document.getElementById("old_balance").value),
+                parseFloat(document.getElementById("new_balance").value)
+            ]
+        };
+
+        fetch('/predict', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            let resultElement = document.getElementById("result");
+            if (data.fraud_detected) {
+                resultElement.innerHTML = "🚨 Fraud Detected!";
+                resultElement.style.color = "red";
+            } else {
+                resultElement.innerHTML = "✅ Transaction is Safe!";
+                resultElement.style.color = "green";
+            }
+        })
+        .catch(error => {
+            document.getElementById("result").innerHTML = "❌ Error: Could not check fraud.";
+        });
+    }
+</script>
+
+</body>
+</html>
